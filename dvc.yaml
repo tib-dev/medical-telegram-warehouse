@@ -1,0 +1,55 @@
+stages:
+  scrape:
+    cmd: bash scripts/run_scraper.sh
+    deps:
+      - scripts/run_scraper.sh
+    outs:
+      - data/raw/telegram_messages
+      - data/raw/images
+
+  enrich_images:
+    cmd: python -m tg_warehouse.enrichment.yolo_detect
+    deps:
+      - src/tg_warehouse/enrichment/yolo_detect.py
+      - data/raw/images
+    outs:
+      - data/interim/images_features.pkl
+      - logs/enrichment
+
+  enrich_metadata:
+    cmd: python -m tg_warehouse.enrichment.ip_geolocation
+    deps:
+      - src/tg_warehouse/enrichment/ip_geolocation.py
+      - data/raw/telegram_messages
+    outs:
+      - data/interim/messages_metadata.pkl
+      - logs/enrichment
+
+  clean_data:
+    cmd: python -m tg_warehouse.loading.load_raw_to_postgres
+    deps:
+      - src/tg_warehouse/loading/load_raw_to_postgres.py
+      - data/interim/messages_metadata.pkl
+      - data/interim/images_features.pkl
+    outs:
+      - data/processed/messages_cleaned.parquet
+      - logs/loading
+
+  dbt_transform:
+    cmd: bash scripts/run_dbt.sh
+    deps:
+      - dbt/medical_warehouse/models
+      - dbt/medical_warehouse/dbt_project.yml
+      - dbt/medical_warehouse/profiles.yml
+      - data/processed/messages_cleaned.parquet
+    outs:
+      - data/processed/marts/
+      - logs/dbt
+
+  run_pipeline:
+    cmd: dagster dev -f orchestration/pipeline.py
+    deps:
+      - orchestration/pipeline.py
+      - data/processed/marts/
+    outs:
+      - logs/dagster
