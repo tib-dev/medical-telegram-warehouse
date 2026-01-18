@@ -1,0 +1,18 @@
+paths:
+  data:
+    data_dir: "data"
+    raw_dir: "data/raw"
+    messages_dir: "data/raw/telegram_messages"
+    images_dir: "data/raw/images"
+    interim_dir: "data/interim"
+    processed_dir: "data/processed"
+  reports:
+    reports_dir: "reports"
+    plots_dir: "reports/plots"
+  logs:
+    logs_dir: "logs"
+    scraping_logs_dir: "logs/scraping"
+    enrichment_logs_dir: "logs/enrichment"
+    loading_logs_dir: "logs/loading"
+    dbt_logs_dir: "logs/dbt"
+    dagster_logs_dir: "logs/dagster"
