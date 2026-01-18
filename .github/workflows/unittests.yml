@@ -1,0 +1,62 @@
+name: CI/CD Pipeline - Code Quality and Testing
+
+# Triggers the workflow on push or pull request events for the main branch
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    # Use a matrix strategy to test against different Python versions
+    strategy:
+      matrix:
+        python-version: ["3.10"] 
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip" # Cache pip dependencies for faster runs
+
+      - name: Install dependencies
+        run: |
+          # Install necessary libraries for linting and testing
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+          # --- ADDED: Install current project in editable mode (-e) ---
+          # This allows Pytest to correctly import and test the source code (e.g., src/)
+          pip install -e .
+
+          # Install testing tools
+          pip install flake8 pytest pytest-cov
+
+      - name: Linting with Flake8 (Code Style Check)
+        run: |
+          echo "Running Flake8..."
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Exit with 0 if no issues found, otherwise print report and exit with 1
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
+          echo "Flake8 check completed successfully."
+
+      - name: Run Pytest and Generate Coverage Report (Unit Testing)
+        run: |
+          echo "Running Pytest..."
+          # Run tests located in the 'tests/' directory
+          pytest tests/ --cov=src --cov-report=xml
+          echo "Pytest completed successfully."
+
+      # - name: Upload coverage reports to Codecov
+      #   uses: codecov/codecov-action@v5
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     files: ./coverage.xml
+      #     fail_ci_if_error: true
