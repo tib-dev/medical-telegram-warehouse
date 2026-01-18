@@ -5,3 +5,8 @@ __pycache__/
 data/
 logs/
 init_setup.sh
+*.session
+dbt/logs
+dbt/medical_warehouse/logs
+dbt/medical_warehouse/target
+src/medi_tg_analytics.egg-info/
