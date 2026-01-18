@@ -1,0 +1,32 @@
+# Core dependencies
+numpy
+pandas
+sqlalchemy
+psycopg2-binary
+fastapi
+uvicorn
+pydantic
+python-dotenv
+pyyaml
+telethon
+ultralytics
+dbt-postgres
+dagster
+dagit
+dvc
+dvc-s3
+requests
+beautifulsoup4
+lxml
+matplotlib
+seaborn
+
+# Dev dependencies
+pytest
+pytest-cov
+black
+isort
+flake8
+pre-commit
+mypy
+jupyter
