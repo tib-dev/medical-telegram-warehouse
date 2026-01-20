@@ -20,7 +20,7 @@ def run_yolo_enrichment(context: OpExecutionContext):
     Enrich scraped Telegram images using YOLO-based detection.
     """
     log_file = logs_dir / "yolo_enrichment.log"
-    script_path = root / "src" / "medi_tg_analytics" / "enrichment" / "yolo_detect.py"
+    script_path = root / "src"/"medi_tg_analytics"/"enrichment"/"yolo_detect.py"
 
     context.log.info(f"Running YOLO enrichment: {script_path}")
     context.log.info(f"YOLO logs -> {log_file}")
@@ -67,6 +67,7 @@ def yolo_load_to_postgres(context: OpExecutionContext):
     """
     log_file = logs_dir / "yolo_load_to_db.log"
     script_path = root / "src/medi_tg_analytics/loading/yolo_csv_to_db.py"
+    
 
     context.log.info(f"Running YOLO result loader: {script_path}")
     context.log.info(f"YOLO Loader logs -> {log_file}")
