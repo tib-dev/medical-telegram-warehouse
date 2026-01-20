@@ -8,7 +8,6 @@ paths:
     processed_dir: "data/processed"
   reports:
     reports_dir: "reports"
-    plots_dir: "reports/plots"
   logs:
     logs_dir: "logs"
     scraping_logs_dir: "logs/scraping"
