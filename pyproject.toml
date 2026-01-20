@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "medi_tg_analytics"
+name = "medical_telegram_analytics"
 version = "0.1.0"
 description = "End-to-end Telegram data warehouse and analytics for Ethiopian medical businesses"
 readme = "README.md"
@@ -19,11 +19,12 @@ keywords = [
     "data-warehouse",
     "dbt",
     "fastapi",
-    "elt",
+    "etl",
     "dagster",
     "yolov8",
     "analytics",
-    "healthcare"
+    "healthcare",
+    "mlops"
 ]
 
 classifiers = [
@@ -49,14 +50,16 @@ dependencies = [
     "ultralytics",
     "dbt-postgres",
     "dagster",
-    "dagit",
-    "dvc",
-    "dvc-s3",
+    "dagster-webserver",
     "requests",
     "beautifulsoup4",
     "lxml",
     "matplotlib",
-    "seaborn"
+    "dvc",
+    "dvc-s3",
+    "dvc[gdrive]"
+    
+
 ]
 
 [project.optional-dependencies]
@@ -77,13 +80,16 @@ Documentation = "https://github.com/tib-dev/medical-telegram-analytics/docs"
 Source = "https://github.com/tib-dev/medical-telegram-analytics"
 
 [tool.setuptools.packages.find]
-where = ["../"]
-exclude = [".venv*"]
+where = ["src"]
+include = ["medi_tg_analytics*"]
 
+# -----------------------
+# Formatting & Linting
+# -----------------------
 
 [tool.black]
 line-length = 88
-target-version = ["py310", "py311"]
+target-version = ["py310", "py311", "py312"]
 exclude = '''
 /(
     \.venv
@@ -113,6 +119,10 @@ exclude = [
     "dbt/medical_warehouse",
     "notebooks"
 ]
+
+# -----------------------
+# Testing & Coverage
+# -----------------------
 
 [tool.pytest.ini_options]
 minversion = "7.0"
