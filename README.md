@@ -132,24 +132,30 @@ medical-telegram-analytics/
 
 ```text
 Telegram Channels
-      │
-      ▼
- Scraper (src/scraping)
-      │
-      ▼
- Raw Data → Data Lake (JSON + Images)
-      │
-      ▼
- PostgreSQL Raw Schema → dbt Staging → dbt Marts (Dimensional Star Schema)
-      │
-      ▼
- Enrichment (YOLOv8 Image Detection)
-      │
-      ▼
- FastAPI Analytical API
-      │
-      ▼
- Users / Dashboards / Reports
+        │
+        ▼
+Scraper
+        │
+        ▼
+Raw Data Lake (JSON + Images)
+        │
+        ▼
+PostgreSQL (raw schema)
+        │
+        ├── YOLO Image Enrichment
+        │        │
+        │        ▼
+        │   Image Detections (interim)
+        │
+        ▼
+dbt Staging → dbt Marts (Star Schema)
+        │
+        ▼
+FastAPI Analytical API
+        │
+        ▼
+Dashboards / Reports / Consumers
+
 ```
 
 ---
@@ -157,25 +163,21 @@ Telegram Channels
 ## Pipeline & Processing Steps
 
 1. **Data Scraping (Extract & Load)**
-
    - Telethon extracts messages and media
    - Raw JSON saved by channel/date in `data/raw/telegram_messages`
    - Images downloaded to `data/raw/images/{channel_name}/{message_id}.jpg`
 
 2. **Data Warehouse (Transform)**
-
    - Raw JSON loaded to PostgreSQL (`raw.telegram_messages`)
    - dbt staging models clean, normalize, and cast data types
    - Dimensional star schema with: `dim_channels`, `dim_dates`, `fct_messages`, `fct_image_detections`
 
 3. **Data Enrichment**
-
    - YOLOv8 detects objects in images
    - Categorizes images (promotional, product_display, lifestyle, other)
    - Results joined to `fct_messages` for enriched analytics
 
 4. **Analytical API**
-
    - FastAPI exposes endpoints:
      - `/api/reports/top-products`
      - `/api/channels/{channel_name}/activity`
@@ -221,20 +223,45 @@ cp .env.example .env
 
 ## Running the Project
 
-### Run full pipeline with DVC
+## Documentation
+
+Generate and serve dbt docs:
 
 ```bash
-dvc repro
+python ./scripts/generate_dbt_doc.py
 ```
 
-### Run individual scripts
+- Docs available at:
+- http://localhost:8080
+
+---
+
+## Orchestration
+
+### Run Dagster:
 
 ```bash
-scripts/run_scraper.sh
-scripts/run_dbt.sh
-scripts/run_pipeline.sh
-scripts/run_api.sh
+dagit -m orchestration.definitions
 ```
+
+### Dagster UI:
+
+- http://localhost:3000
+
+---
+
+## API
+
+Run API:
+
+```bash
+uvicorn api.main.app --reload
+```
+
+- Docs:
+- http://localhost:8000/docs
+
+---
 
 ### Access API
 
