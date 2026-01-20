@@ -54,6 +54,7 @@ models:
         tests:
           - not_null
 
+
   # ======================================================
   # DIMENSION: CHANNELS
   # ======================================================
@@ -95,6 +96,7 @@ models:
 
       - name: avg_views
         description: "Average number of views per message in the channel"
+
 
   # ======================================================
   # DIMENSION: DATES
@@ -155,8 +157,9 @@ models:
         tests:
           - not_null
 
+
   # ======================================================
-  # FACT TABLE
+  # FACT: MESSAGES
   # ======================================================
   - name: fct_messages
     description: "Fact table containing metrics for each Telegram message"
@@ -206,5 +209,51 @@ models:
 
       - name: has_image
         description: "Indicates whether the message contains an image"
+        tests:
+          - not_null
+
+
+  # ======================================================
+  # FACT: IMAGE DETECTIONS (YOLO)
+  # ======================================================
+  - name: fct_image_detections
+    description: "Fact table containing YOLO-based image detection results linked to Telegram messages"
+
+    columns:
+      - name: message_id
+        description: "Telegram message ID associated with the image"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_messages')
+                field: message_id
+
+      - name: channel_key
+        description: "Foreign key referencing dim_channels"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_channels')
+                field: channel_key
+
+      - name: date_key
+        description: "Foreign key referencing dim_dates"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_dates')
+                field: date_key
+
+      - name: detected_class
+        description: "Object class detected by YOLO (e.g., person, bottle)"
+
+      - name: confidence_score
+        description: "YOLO confidence score for the detected object"
+
+      - name: image_category
+        description: "Derived image category (promotional, product_display, lifestyle, other)"
         tests:
           - not_null
