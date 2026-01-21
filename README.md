@@ -255,7 +255,7 @@ dagit -m orchestration.definitions
 Run API:
 
 ```bash
-uvicorn api.main.app --reload
+uvicorn api.main:app --reload
 ```
 
 - Docs:
